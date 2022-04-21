@@ -2,11 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <style>
+      #preview pre code {
+        color: white;
+        display: block;
+        background: #272822;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css"
+    />
     <title>Test</title>
   </head>
   <body>
-    <button id="btn">点我patch~  </button>
-    <div id="root"></div>
+    <textarea style="width: 300px; height: 200px" id="textarea"></textarea>
+    <button id="btn">点我patch~</button>
+    <div id="preview">
+      <div id="root"></div>
+    </div>
+
     <script src="bundle.js"></script>
   </body>
 </html>

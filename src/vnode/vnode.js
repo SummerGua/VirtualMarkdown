@@ -1,5 +1,7 @@
 // h函数
-export default function (sel, data, children, text, elm, key) {
+export default function (sel, data, children, text, elm) {
+  const key = data.key
+  let toInline = data.toInline
   return {
     sel, // selector
     data, // some props
@@ -7,5 +9,6 @@ export default function (sel, data, children, text, elm, key) {
     text, // string
     elm,
     key, // unique key
+    toInline
   }
 }
