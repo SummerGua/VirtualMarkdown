@@ -3,7 +3,6 @@ import { inline } from './rules'
 import h from '../vnode/vnode'
 
 export default function inlineLexer(toInlineSrc) {
-  console.log('toInlineSrc--', toInlineSrc)
   let vnodes = []
   let tokens = []
   while (toInlineSrc) {
@@ -34,7 +33,7 @@ export default function inlineLexer(toInlineSrc) {
     if ((tokens = inline.strong.exec(toInlineSrc))) {
       toInlineSrc = cutSrc(toInlineSrc, tokens)
       // 文字+<em></em>+文字怎么办？节点过多
-      vnode = h('strong', {}, Lexer.lex(tokens[2] || tokens[1]))
+      vnode = h('strong', {}, inlineLexer(tokens[2] || tokens[1]))
       vnodes.push(vnode)
       continue
     }
@@ -57,7 +56,6 @@ export default function inlineLexer(toInlineSrc) {
 
     // del
     if ((tokens = inline.del.exec(toInlineSrc))) {
-      console.log('del inner', toInlineSrc)
       toInlineSrc = cutSrc(toInlineSrc, tokens)
       vnode = h('del', {}, inlineLexer(tokens[1]))
       vnodes.push(vnode)
@@ -66,12 +64,12 @@ export default function inlineLexer(toInlineSrc) {
 
     // text
     if ((tokens = inline.text.exec(toInlineSrc))) {
-      console.log('text')
       toInlineSrc = cutSrc(toInlineSrc, tokens)
       // 文字+<em></em>+文字怎么办？节点过多
-      // 防止# *1*前面的空格
       if (tokens[0].replace(/ +/, '') == '') continue
       else {
+        // 防止# *1*前面的空格
+        tokens[0] = tokens[0].replace(/ +/, '')
         vnode = h('span', {}, [], tokens[0])
         vnodes.push(vnode)
         continue
@@ -79,8 +77,7 @@ export default function inlineLexer(toInlineSrc) {
     }
 
     if (toInlineSrc) {
-      console.log('仍有未处理的inline')
-      return
+      throw new Error('some inline not be processed')
     }
   }
   return vnodes

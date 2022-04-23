@@ -7,7 +7,7 @@ export class Lexer {
   constructor() {}
 
   static lex(src) {
-    // 静态方法-类名调用 e.g. Lexer.lex(param)
+    // 静态方法-类名调用 Lexer.lex(param)
     const lexer = new Lexer()
     let vnodes = lexer.lex(src)
     return lexer.inlineLex(vnodes)
@@ -39,7 +39,7 @@ export class Lexer {
         let data = {}
         if (tokens[2] != null) {
           data = {
-            class: `lang-${tokens[2]}`
+            class: `lang-${tokens[2]}`,
           }
         }
         vnode = h('pre', {}, [h('code', data, [], tokens[3] || '')])
@@ -61,6 +61,75 @@ export class Lexer {
         continue
       }
 
+      // list
+      if ((tokens = block.list.exec(src))) {
+        src = cutSrc(src, tokens)
+        let bull = tokens[2]
+        tokens = tokens[0].match(block.item)
+
+        let i = 0
+        const list = []
+        for (; i < tokens.length; i++) {
+          let item = tokens[i]
+          let space = item.length
+          item = item.replace(/^ *([*+-]|\d+\.) +/, '')
+
+          // 减少缩进
+          if (~item.indexOf('\n ')) {
+            space -= item.length
+            item = item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
+          }
+
+          // 确定下一个列表项是否属于这里。
+          if (i !== tokens.length - 1) {
+            let b = block.bullet.exec(tokens[i + 1])[0]
+            if (bull !== b && !(bull.length > 1 && b.length > 1)) {
+              src = tokens.slice(i + 1).join('\n') + src
+              i = tokens.length - 1
+            }
+          }
+          list.push(this.lex(item))
+        }
+        vnode = h(
+          bull.length > 1 ? 'ol' : 'ul',
+          {},
+          list.map((li) => {
+            return h('li', {}, li)
+          })
+        )
+        vnodes.push(vnode)
+        continue
+      }
+
+      // table
+      if ((tokens = block.table.exec(src))) {
+        src = cutSrc(src, tokens)
+        const thead = tokens[1].replace(/^ *| *\| *$/g, '').split(/ *\| */)
+        const align = tokens[2]
+          .replace(/^ *|\| *$/g, '')
+          .split(/ *\| */)
+          .map((al) => {
+            if (/^ *-+: *$/.test(al)) {
+              return 'right'
+            } else if (/^ *:-+: *$/.test(al)) {
+              return 'center'
+            } else if (/^ *:-+ *$/.test(al)) {
+              return 'left'
+            } else {
+              return null
+            }
+          })
+
+        const tbody = tokens[3]
+          .replace(/(?: *\| *)?\n$/, '')
+          .split('\n')
+          .map((tr) => {
+            return tr.replace(/^ *\| *| *\| *$/g, '').split(/ *\| */)
+          })
+        vnodes.push(this.lexTable(thead, tbody, align))
+        continue
+      }
+
       // paragraph
       if ((tokens = block.paragraph.exec(src))) {
         src = cutSrc(src, tokens)
@@ -70,7 +139,6 @@ export class Lexer {
               ? tokens[1].slice(0, -1) // 0到最后
               : tokens[1],
         })
-        console.log('para', tokens[1])
         vnodes.push(vnode)
         continue
       }
@@ -85,11 +153,9 @@ export class Lexer {
       }
 
       if (src) {
-        console.log('仍有未处理的block')
-        break
+        throw new Error('some block not be processed')
       }
     }
-    console.log(vnodes)
     return vnodes
   }
 
@@ -112,5 +178,53 @@ export class Lexer {
       vnode = vnodes[++i]
     }
     return vnodes // 最后用这个vnodes渲染
+  }
+
+  /**
+   * 解析表格
+   * @param thead
+   * @param tbody
+   * @param align
+   */
+  lexTable(thead, tbody, align) {
+    const vnode = h('table', {}, [
+      h('thead', {}, [
+        h(
+          'tr',
+          {},
+          thead.map((th, index) => {
+            const data = {}
+            if (align[index] != null) {
+              data['align'] = align[index]
+            }
+            const inline = {
+              toInline: th,
+            }
+            return h('th', { ...data, ...inline })
+          })
+        ),
+      ]),
+      h(
+        'tbody',
+        {},
+        tbody.map((tr) => {
+          return h(
+            'tr',
+            {},
+            tr.map((td, index) => {
+              const data = {}
+              if (align[index] != null) {
+                data['align'] = align[index]
+              }
+              const inline = {
+                toInline: td,
+              }
+              return h('td', { ...data, ...inline })
+            })
+          )
+        })
+      ),
+    ])
+    return vnode
   }
 }

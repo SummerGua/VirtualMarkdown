@@ -5,11 +5,10 @@ import { isSameVnode, isRealDom } from '../utils/utils'
 
 // patch
 export default function patch(oldVnode, newVnode) {
-  console.log(newVnode)
   newVnode.elm = oldVnode.elm
   // 第一个参数是DOM时，需要包装为虚拟DOM
   if (isRealDom(oldVnode)) {
-    oldVnode = h(oldVnode.tagName.toLowerCase(), {}, [], undefined, oldVnode, 1)
+    oldVnode = h(oldVnode.tagName.toLowerCase(), {}, [], undefined, oldVnode)
   }
 
   if (isSameVnode(oldVnode, newVnode)) {
@@ -41,7 +40,7 @@ export default function patch(oldVnode, newVnode) {
     ) {
       // 新vnode有text属性
       if (newVnode.text !== oldVnode.text) {
-        // text不一样则改变oldVnode.elm的innerText
+        // text不一样则改变oldVnode.elm的textContent
         oldVnode.elm.textContent = newVnode.text
       }
     } else {

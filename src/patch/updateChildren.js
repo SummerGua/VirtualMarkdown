@@ -81,7 +81,7 @@ export default function updateChildren(parentElm, oldChildren, newChildren) {
       newStartVnode = newChildren[++newStartIdx]
     }
   }
-  
+
   if (newStartIdx <= newEndIdx) {
     // 两个new之间仍然存在节点
     const pivot =
