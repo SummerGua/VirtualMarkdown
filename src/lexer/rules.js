@@ -50,25 +50,13 @@ block.paragraph = edit(block._paragraph)
 
 export const inline = {
   escape: /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/,
-  autolink: /^<(scheme:[^\s\x00-\x1f<>]*|email)>/,
-  tag:
-    '^comment' +
-    '|^</[a-zA-Z][\\w:-]*\\s*>' + // self-closing tag
-    '|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>' + // open tag
-    '|^<\\?[\\s\\S]*?\\?>' + // processing instruction, e.g. <?php ?>
-    '|^<![a-zA-Z]+\\s[\\s\\S]*?>' + // declaration, e.g. <!DOCTYPE html>
-    '|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>', // CDATA section
   _link: /^!?\[(label)\]\(href\)/,
-  reflink: /^!?\[(label)\]\[(ref)\]/,
-  nolink: /^!?\[(ref)\](?:\[\])?/,
-  reflinkSearch: 'reflink|nolink(?!\\()',
   strong: /^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,
   em: /^\b_((?:[^_]|__)+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
   code: /^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/,
   br: /^( {2,}|\\)\n(?!\s*$)/,
   del: /^~~(?=\S)([\s\S]*?\S)~~/,
   text: /^[\s\S]+?(?=[\\<![_*`~]|https?:\/\/| *\n|$)/,
-  punctuation: /^([\spunctuation])/,
   _label: /(?:\[[^\]]*\]|[^[\]]|\](?=[^[]*\]))*/,
   _href: /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/,
 }
