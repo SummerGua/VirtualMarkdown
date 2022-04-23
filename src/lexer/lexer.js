@@ -61,6 +61,14 @@ export class Lexer {
         continue
       }
 
+      // blockquote
+      if ((tokens = block.blockquote.exec(src))) {
+        src = cutSrc(src, tokens)
+        tokens = tokens[0].replace(/^ *> ?/gm, '')
+        vnodes.push(h('blockquote', {}, this.lex(tokens)))
+        continue
+      }
+
       // list
       if ((tokens = block.list.exec(src))) {
         src = cutSrc(src, tokens)

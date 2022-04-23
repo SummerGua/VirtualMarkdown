@@ -9,7 +9,7 @@ export const block = {
   hr: /^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/,
   list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
   heading: /^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/,
-  _blockquote: /^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/,
+  blockquote: /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,
   lheading: /^([^\n]+)\n {0,3}(=+|-+) *(?:\n+|$)/,
   def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
   table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/,
@@ -29,6 +29,8 @@ block._tag =
   '|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option' +
   '|p|param|section|source|summary|table|tbody|td|tfoot|th|thead|title|tr' +
   '|track|ul'
+
+block.blockquote  = edit(block.blockquote).replace('def', block.def).getRegex()
 
 block.list = edit(block.list)
   .replace(/bull/g, block.bullet)

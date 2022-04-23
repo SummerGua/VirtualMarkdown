@@ -10,12 +10,26 @@
 - [Markdown365-parser](https://github.com/nashaofu/markdown365-parser)
 
 
-## Usage
+## Run
 `npm install` for init
 
 `npm run serve` for HMR
 
 `npm run build` for packing
+
+## Usage
+```js
+import VirtualMarkdown from './virtualMarkdown'
+
+// get root element
+const btn = document.getElementById('btn')
+const vm = new VirtualMarkdown('root')
+
+btn.addEventListener('click', () => {
+  const toRenderSrc = document.getElementById('textarea').value
+  vm.render(toRenderSrc) // start to update nodes
+})
+```
 
 ## Supported syntax
 
@@ -24,10 +38,11 @@ h1~h6
 ol-li
 ul-li
 table
-italic
 code block
+blockquote
+link or image
 hr
+italic
 del
 bold
-link or image
 ```
