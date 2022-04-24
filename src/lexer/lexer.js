@@ -20,12 +20,20 @@ export class Lexer {
    */
   lex(src) {
     // 原型方法-实例调用 传入原始markdown
+
+    let tokens = []
+    let vnodes = []
+
+    if (src === '') {
+      vnodes.push(h('span', {}, [], ''))
+      return vnodes
+    }
+
     src = src
       .replace(/\r\n|\r/g, '\n')
       .replace(/\t/g, '    ')
       .replace(/^ +$/gm, '')
-    let tokens = []
-    let vnodes = []
+
     while (src) {
       let vnode = null
       // newline
